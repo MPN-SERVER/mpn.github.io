@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div id="app" class="container mt-5">
+        <h2 class="mb-4">DATA JACKPOT PEJUANG KASINO</h2>
+        <button class="btn btn-success mb-3" @click="showForm = true">+ Tambah Data</button>
+
+        <!-- Form Tambah Data -->
+        <div v-if="showForm" class="card p-3 mb-3">
+            <h5>Tambah Data</h5>
+            <div class="mb-2">
+                <label>Nama Game:</label>
+                <input type="text" v-model="newItem.game" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label>Nomor Telepon:</label>
+                <input type="text" v-model="newItem.phone" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label>Total Hadiah:</label>
+                <input type="number" v-model="newItem.prize" class="form-control">
+            </div>
+            <div class="mb-2">
+                <label>Status:</label>
+                <select v-model="newItem.status" class="form-select">
+                    <option value="on progress">On Progress</option>
+                    <option value="done">Done</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label>Account Type:</label>
+                <select v-model="newItem.accountType" class="form-select">
+                    <option value="jackpot sensasional">Jackpot Sensasional</option>
+                    <option value="free scatter">Free Scatter</option>
+                    <option value="bet 50-500%">Bet 50-500%</option>
+                    <option value="maxwin">Maxwin</option>
+                </select>
+            </div>
+            <button class="btn btn-primary me-2" @click="addItem">Simpan</button>
+            <button class="btn btn-secondary" @click="showForm = false">Batal</button>
+        </div>
+
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Nama Game</th>
+                    <th>Nomor Telepon</th>
+                    <th>Account Type</th> <!-- Dipindahkan ke sebelah kanan Nomor Telepon -->
+                    <th>Total Hadiah</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(item, index) in data" :key="index">
+                    <td>{{ index + 1 }}</td>
+                    <td>{{ item.game }}</td>
+                    <td>{{ item.phone }}</td>
+                    <td>
+                        <select v-model="item.accountType" @change="updateAccountType(item)" class="form-select">
+                            <option value="jackpot sensasional">Jackpot Sensasional</option>
+                            <option value="free scatter">Free Scatter</option>
+                            <option value="bet 50-500%">Bet 50-500%</option>
+                            <option value="maxwin">Maxwin</option>
+                        </select>
+                    </td>
+                    <td>Rp {{ item.prize.toLocaleString() }}</td>
+                    <td>
+                        <select v-model="item.status" @change="updateStatus(item)" class="form-select">
+                            <option value="on progress">On Progress</option>
+                            <option value="done">Done</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-warning btn-sm me-2" @click="editItem(item)">Edit</button>
+                        <button class="btn btn-danger btn-sm" @click="deleteItem(index)">Hapus</button>
+                    </td>
+                </tr>
+            </tbody>
+            
+        </table>
+    </div>
+    
+    <script>
+        const app = Vue.createApp({
+            data() {
+                return {
+                    showForm: false,
+                    newItem: { game: '', phone: '', prize: '', status: 'on progress', accountType: 'jackpot sensasional' },
+                    data: [
+                        { game: 'MAHYONG 2', phone: '081234567890', prize: 500000, status: 'on progress', accountType: 'maxwin' },
+                        { game: 'OLYMPUS 1000', phone: '089876543210', prize: 750000, status: 'done', accountType: 'bet 50-500%' }
+                    ]
+                };
+            },
+            methods: {
+                addItem() {
+                    if (this.newItem.game && this.newItem.phone && this.newItem.prize) {
+                        this.data.push({ ...this.newItem });
+                        this.newItem = { game: '', phone: '', prize: '', status: 'on progress', accountType: 'jackpot sensasional' };
+                        this.showForm = false;
+                    } else {
+                        alert('Harap isi semua data!');
+                    }
+                },
+                updateStatus(item) {
+                    console.log('Status diperbarui:', item.status);
+                },
+                updateAccountType(item) {
+                    console.log('Account Type diperbarui:', item.accountType);
+                },
+                editItem(item) {
+                    let newGame = prompt('Masukkan nama game baru:', item.game);
+                    let newPhone = prompt('Masukkan nomor baru:', item.phone);
+                    let newPrize = prompt('Masukkan total hadiah baru:', item.prize);
+                    let newAccountType = prompt('Masukkan Account Type (jackpot sensasional, free scatter, bet 50-500%, maxwin):', item.accountType);
+                    if (newGame) item.game = newGame;
+                    if (newPhone) item.phone = newPhone;
+                    if (newPrize) item.prize = parseInt(newPrize);
+                    if (newAccountType) item.accountType = newAccountType;
+                },
+                deleteItem(index) {
+                    if (confirm('Yakin ingin menghapus?')) {
+                        this.data.splice(index, 1);
+                    }
+                }
+            }
+        });
+        app.mount('#app');
+    </script>
+
+<footer>
+    <p>© 2025 Mr.TAM. All Rights Reserved.</p>
+</footer>
+
+</body>
+</html>
